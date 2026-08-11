@@ -1,4 +1,4 @@
-Backend Base en Express con TypeScript + MySQL + MongoDB
+Backend Base en Express con TypeScript + MongoDB
 
 --------------------------------------------------------------------------------
 
@@ -7,13 +7,13 @@ Estructura Base:
 .
 ├── src
 │   ├── config
-│   │   ├── db.config.ts          → Configuración MySQL
 │   │   └── mongodb.config.ts     → Configuración MongoDB
 │   │
-│   ├── routes                    → Rutas de la API
+│   ├── models                    → Modelos y colecciones MongoDB
+│   ├── routers                   → Rutas de la API
 │   ├── controllers               → Controladores (http)
 │   ├── services                  → Servicios (lógica de negocio)
-│   ├── repositories              → Acceso a datos (MySQL / Mongo)
+│   ├── repositorys               → Acceso a datos MongoDB
 │   ├── utils                     → Extras (constantes, etc)
 │   │
 │   └── index.ts                  → Punto de entrada de la app
@@ -45,6 +45,10 @@ Contiene la lógica de negocio y llama a repository si hace falta.
 
 Capa que accede a la base de datos y devuelve una respuesta a service.
 
+5) Models
+
+Define las colecciones de MongoDB y los tipos usados por repository.
+
 --------------------------------------------------------------------------------
 
 Scripts disponibles
@@ -71,10 +75,53 @@ Responde:
 
 - Fecha del servidor
 
-- Ping MySQL (NOW())
-
 - Ping Mongo (db.command())
 
 - Resultado de 1 + 1
 
 Sirve para verificar que TODO funciona correctamente.
+
+--------------------------------------------------------------------------------
+
+Ejemplo de endpoints principales de usuarios
+
+Colección MongoDB usada: usuarios
+
+Crear usuario
+
+POST /api/users
+
+Body:
+
+```json
+{
+  "nombre": "Juan Perez",
+  "email": "juan@example.com",
+  "edad": 25
+}
+```
+
+Listar usuarios
+
+GET /api/users
+
+Obtener usuario por id
+
+GET /api/users/64f1a2b3c4d5e6f789012345
+
+Actualizar usuario
+
+PUT /api/users/64f1a2b3c4d5e6f789012345
+
+Body:
+
+```json
+{
+  "nombre": "Juan Perez actualizado",
+  "edad": 26
+}
+```
+
+Eliminar usuario
+
+DELETE /api/users/64f1a2b3c4d5e6f789012345

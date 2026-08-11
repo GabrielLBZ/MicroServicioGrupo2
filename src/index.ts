@@ -1,7 +1,6 @@
 import express from "express";
 import "dotenv/config";
 import { connectMongo, mongoDb } from "./config/mongodb.config";
-import { mysqlPool } from "./config/db.config";
 import userRoutes from "./routers/user.router";
 
 const app = express();
@@ -9,43 +8,38 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.use("/api/users", userRoutes)
+app.use("/api/users", userRoutes);
 
 app.get("/", async (req, res) => {
-    try {
-        const [rows] : any = await mysqlPool.query("SELECT NOW() AS fecha");
+  try {
+    const db = mongoDb();
+    const mongoPing = await db.command({ ping: 1 });
 
-        const db = mongoDb();
-        const mongoPing = await db.command({ ping: 1 });
-
-        res.json({
-            mensaje: `Servidor funcionando correctamente`,
-            fecha_servidor: new Date(),
-            mysql_fecha: rows[0].fecha,
-            mongo_ping: mongoPing.ok,
-            suma: 1 + 1
-        });
-    } catch (err) {
-        res.status(500).json({
-            error: `Error en el servidor: Error de conexiones`,
-            detalle: err
-        });
-    }
+    res.json({
+      mensaje: "Servidor funcionando correctamente",
+      fecha_servidor: new Date(),
+      mongo_ping: mongoPing.ok,
+      suma: 1 + 1,
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: "Error en el servidor: Error de conexion con MongoDB",
+      detalle: err,
+    });
+  }
 });
 
 async function startServer() {
-    try {
-        await connectMongo();
-        await mysqlPool.getConnection();
-        console.log("MySQL conectado ✔");
+  try {
+    await connectMongo();
 
-        app.listen(PORT, () => {
-            console.log(`Servidor corriendo en el puerto ${PORT}`);
-        });
-    } catch (err) {
-        console.error(`Error en el servidor: Error al iniciar el servidor ${err}`);
-        process.exit(1);
-    }
+    app.listen(PORT, () => {
+      console.log(`Servidor corriendo en el puerto ${PORT}`);
+    });
+  } catch (err) {
+    console.error(`Error en el servidor: Error al iniciar el servidor ${err}`);
+    process.exit(1);
+  }
 }
 
 startServer();
