@@ -125,3 +125,34 @@ Body:
 Eliminar usuario
 
 DELETE /api/users/64f1a2b3c4d5e6f789012345
+
+--------------------------------------------------------------------------------
+
+Ejemplo de endpoints de travel plans
+
+Colección MongoDB usada: travelPlans
+
+Generar plan de viaje con Gemini
+
+POST /api/travel-plans/generar
+
+Body:
+
+```json
+{
+  "prompt": "Quiero viajar 5 dias a Mendoza con bajo presupuesto"
+}
+```
+
+Listar planes generados
+
+GET /api/travel-plans
+
+Obtener plan generado por id
+
+GET /api/travel-plans/64f1a2b3c4d5e6f789012345
+
+Variables de entorno necesarias:
+
+- GEMINI_API_KEY
+- GEMINI_MODEL opcional, por defecto usa gemini-2.5-flash
