@@ -12,7 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^17.2.3",
+    "@google/genai": "^2.16.0",
+    "dotenv": "^17.4.2",
     "express": "^5.1.0",
     "mongodb": "^7.0.0"
   },

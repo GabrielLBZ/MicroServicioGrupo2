@@ -4,6 +4,7 @@ import express from "express";
 import "dotenv/config";
 import { connectMongo, mongoDb } from "./config/mongodb.config";
 import userRoutes from "./routers/user.router";
+import geminiRoutes from "./routers/gemini.routes";
 
 setServers(["1.1.1.1", "8.8.8.8"]);
 
@@ -14,6 +15,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 app.use("/api/users", userRoutes);
+app.use("/api/ia", geminiRoutes);
 
 app.get("/", async (req, res) => {
   try {
