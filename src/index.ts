@@ -1,7 +1,12 @@
+import { setServers } from "node:dns";
+
 import express from "express";
 import "dotenv/config";
 import { connectMongo, mongoDb } from "./config/mongodb.config";
 import userRoutes from "./routers/user.router";
+
+setServers(["1.1.1.1", "8.8.8.8"]);
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
