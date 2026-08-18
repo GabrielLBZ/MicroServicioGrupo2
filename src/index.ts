@@ -6,6 +6,7 @@ import { connectMongo, mongoDb } from "./config/mongodb.config";
 import userRoutes from "./routers/user.router";
 import geminiRoutes from "./routers/gemini.routes";
 import travelPlanRoutes from "./routers/travelPlan.routers";
+import conversacionRoutes from "./routers/conversacion.routes";
 
 setServers(["1.1.1.1", "8.8.8.8"]);
 
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/ia", geminiRoutes);
 app.use("/api/travel-plans", travelPlanRoutes);
+app.use("/api/conversaciones", conversacionRoutes);
 
 app.get("/", async (req, res) => {
   try {
