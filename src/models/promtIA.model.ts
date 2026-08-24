@@ -347,7 +347,30 @@ Cada pregunta debe tener esta estructura:
 {
   "campo": "lugarSalida",
   "pregunta": "¿Desde qué ciudad viajarían?",
-  "motivo": "Necesito conocer el punto de partida para calcular distancias y costos de transporte."
+  "motivo": "Necesito conocer el punto de partida para calcular distancias y costos de transporte.",
+  "tipoPregunta": "texto"
+}
+\`\`\`
+
+\`tipoPregunta\` indica cómo debe presentarse la pregunta al usuario. Puede ser:
+
+\`\`\`text
+siNo | opciones | texto
+\`\`\`
+
+* \`siNo\`: usalo cuando la respuesta se pueda reducir a Sí/No (por ejemplo "¿el presupuesto incluye los pasajes?", "¿tienen fechas flexibles?"). El campo \`opciones\` no debe incluirse.
+* \`opciones\`: usalo cuando exista un conjunto acotado y conocido de alternativas razonables entre las que el usuario pueda elegir (por ejemplo la clase del vuelo, el ritmo del viaje, el nivel de interés en algo). En ese caso agregá también \`opciones\`, un array de 2 a 5 strings cortos con las alternativas, en el mismo idioma que la pregunta.
+* \`texto\`: usalo para todo lo demás, cuando la respuesta sea información libre que el usuario tiene que escribir (ciudad, fechas, presupuesto, cantidad de viajeros, destinos preferidos, etc.).
+
+Ejemplo con \`opciones\`:
+
+\`\`\`json
+{
+  "campo": "preferencias.ritmoViaje",
+  "pregunta": "¿Qué ritmo de viaje prefieren?",
+  "motivo": "Afecta cuántas actividades por día conviene recomendar.",
+  "tipoPregunta": "opciones",
+  "opciones": ["Tranquilo", "Equilibrado", "Intenso"]
 }
 \`\`\`
 
@@ -434,7 +457,8 @@ No menciones nombres técnicos de propiedades del JSON al usuario.
     {
       "campo": "lugarSalida",
       "pregunta": "¿Desde qué ciudad viajarían?",
-      "motivo": "El punto de salida afecta considerablemente las opciones y el costo del viaje."
+      "motivo": "El punto de salida afecta considerablemente las opciones y el costo del viaje.",
+      "tipoPregunta": "texto"
     }
   ]
 }

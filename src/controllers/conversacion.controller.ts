@@ -4,7 +4,7 @@ import { ConversacionError, ConversacionService } from "../services/conversacion
 export class ConversacionController {
   static async enviarMensaje(req: Request, res: Response, next: NextFunction) {
     try {
-      const { usuarioId, mensaje, conversacionId } = req.body;
+      const { usuarioId, mensaje, conversacionId, nuevaConversacion } = req.body;
 
       if (!usuarioId || typeof usuarioId !== "string") {
         return res.status(400).json({ mensaje: "Debes enviar un usuarioId" });
@@ -17,10 +17,30 @@ export class ConversacionController {
       const resultado = await ConversacionService.enviarMensaje(
         usuarioId,
         mensaje,
-        conversacionId
+        conversacionId,
+        Boolean(nuevaConversacion)
       );
 
       res.status(200).json(resultado);
+    } catch (err) {
+      if (err instanceof ConversacionError) {
+        return res.status(err.statusCode).json({ mensaje: err.message });
+      }
+
+      next(err);
+    }
+  }
+
+  static async listar(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { usuarioId } = req.query;
+
+      if (!usuarioId || typeof usuarioId !== "string") {
+        return res.status(400).json({ mensaje: "Debes enviar un usuarioId" });
+      }
+
+      const conversaciones = await ConversacionService.listarPorUsuario(usuarioId);
+      res.json(conversaciones);
     } catch (err) {
       if (err instanceof ConversacionError) {
         return res.status(err.statusCode).json({ mensaje: err.message });

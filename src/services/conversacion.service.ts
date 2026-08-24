@@ -40,10 +40,31 @@ export class ConversacionService {
     return await ConversacionRepository.obtenerPorId(id);
   }
 
+  static async listarPorUsuario(usuarioId: string) {
+    if (!ObjectId.isValid(usuarioId)) {
+      throw new ConversacionError("usuarioId inválido", 400);
+    }
+
+    const conversaciones = await ConversacionRepository.listarPorUsuario(
+      new ObjectId(usuarioId)
+    );
+
+    return conversaciones.map((conversacion) => ({
+      conversacionId: conversacion._id!.toString(),
+      estado: conversacion.estado,
+      titulo:
+        conversacion.mensajes.find((m) => m.rol === "usuario")?.contenido ??
+        "Nueva conversación",
+      createdAt: conversacion.createdAt,
+      updatedAt: conversacion.updatedAt,
+    }));
+  }
+
   static async enviarMensaje(
     usuarioId: string,
     mensajeUsuario: string,
-    conversacionId?: string
+    conversacionId?: string,
+    nuevaConversacion?: boolean
   ) {
     if (!ObjectId.isValid(usuarioId)) {
       throw new ConversacionError("usuarioId inválido", 400);
@@ -63,7 +84,11 @@ export class ConversacionService {
       throw new ConversacionError("Conversación no encontrada", 404);
     }
 
-    if (!conversacion) {
+    // Sin conversacionId, por defecto retoma la última "en_progreso" del
+    // usuario (comportamiento histórico). `nuevaConversacion: true` lo
+    // saltea explícitamente para permitir abrir una charla nueva aunque ya
+    // exista una sin terminar (ver módulo de conversaciones en el front).
+    if (!conversacion && !nuevaConversacion) {
       conversacion = await ConversacionRepository.obtenerEnProgresoPorUsuario(
         new ObjectId(usuarioId)
       );

@@ -33,6 +33,17 @@ export class ConversacionRepository {
     }
   }
 
+  static async listarPorUsuario(usuarioId: ObjectId) {
+    try {
+      return await conversacionesCollection()
+        .find({ usuarioId })
+        .sort({ updatedAt: -1 })
+        .toArray();
+    } catch (err) {
+      throw new Error("Error al listar las conversaciones del usuario: " + err);
+    }
+  }
+
   static async crear(conversacion: CrearConversacion) {
     try {
       const now = new Date();

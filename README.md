@@ -203,11 +203,31 @@ Respuesta (mientras falta información):
     {
       "campo": "lugarSalida",
       "pregunta": "¿Desde qué ciudad viajarían?",
-      "motivo": "El punto de salida afecta considerablemente las opciones y el costo del viaje."
+      "motivo": "El punto de salida afecta considerablemente las opciones y el costo del viaje.",
+      "tipoPregunta": "texto"
+    },
+    {
+      "campo": "preferencias.ritmoViaje",
+      "pregunta": "¿Qué ritmo de viaje prefieren?",
+      "motivo": "Afecta cuántas actividades por día conviene recomendar.",
+      "tipoPregunta": "opciones",
+      "opciones": ["Tranquilo", "Equilibrado", "Intenso"]
+    },
+    {
+      "campo": "presupuesto.incluyeTransporte",
+      "pregunta": "¿Ese presupuesto incluye los pasajes?",
+      "motivo": "Necesito saber si el monto es solo para estadía o también para el transporte.",
+      "tipoPregunta": "siNo"
     }
   ]
 }
 ```
+
+`tipoPregunta` indica cómo debería presentarse la pregunta en el cliente:
+
+- `texto`: mostrar un campo de texto libre para que el usuario escriba.
+- `siNo`: mostrar botones/opciones de Sí / No.
+- `opciones`: mostrar una encuesta de opción múltiple con las alternativas del array `opciones` (2 a 5 strings).
 
 Respuesta (cuando ya hay información suficiente):
 
@@ -223,6 +243,34 @@ Respuesta (cuando ya hay información suficiente):
 ```
 
 Una vez que una conversación llega a `estado: "listoParaBuscar"` queda marcada como `completo` y no acepta más mensajes (devuelve 409).
+
+Si no se envía `conversacionId`, por defecto se retoma la última conversación `en_progreso` del usuario. Para forzar una conversación nueva aunque exista una sin terminar, mandá `nuevaConversacion: true` en el body en vez de `conversacionId`:
+
+```json
+{
+  "usuarioId": "64f1a2b3c4d5e6f789012345",
+  "mensaje": "Quiero planear otro viaje distinto",
+  "nuevaConversacion": true
+}
+```
+
+Listar conversaciones de un usuario
+
+GET /api/conversaciones?usuarioId=64f1a2b3c4d5e6f789012345
+
+```json
+[
+  {
+    "conversacionId": "64f1a2b3c4d5e6f789099999",
+    "estado": "en_progreso",
+    "titulo": "Quiero viajar el mes que viene por unos 10 dias...",
+    "createdAt": "2026-08-18T20:00:00.000Z",
+    "updatedAt": "2026-08-18T20:05:00.000Z"
+  }
+]
+```
+
+`titulo` es el primer mensaje del usuario en esa conversación, para mostrar en un listado tipo historial de chats.
 
 Obtener una conversación por id
 
