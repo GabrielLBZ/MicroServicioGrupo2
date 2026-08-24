@@ -155,4 +155,77 @@ GET /api/travel-plans/64f1a2b3c4d5e6f789012345
 Variables de entorno necesarias:
 
 - GEMINI_API_KEY
-- GEMINI_MODEL opcional, por defecto usa gemini-2.5-flash
+- GEMINI_MODEL opcional, por defecto usa gemini-3.1-flash-lite
+
+--------------------------------------------------------------------------------
+
+Ejemplo de endpoints de conversaciones (recolección conversacional del viaje)
+
+Colección MongoDB usada: conversacionesViaje
+
+Este módulo conversa con el usuario en lenguaje natural y va armando, mensaje a mensaje, el perfil estructurado (JSON) del viaje que quiere hacer (fechas, presupuesto, viajeros, destino, preferencias, restricciones, etc.), sin todavía recomendar destinos concretos.
+
+Enviar un mensaje
+
+POST /api/conversaciones/mensaje
+
+Body (primer mensaje, sin conversacionId):
+
+```json
+{
+  "usuarioId": "64f1a2b3c4d5e6f789012345",
+  "mensaje": "Quiero viajar el mes que viene por unos 10 dias, tengo 1000 USD, somos dos amigos y buscamos calor y playa"
+}
+```
+
+Body (mensajes siguientes, ya con conversacionId devuelto por el primer mensaje):
+
+```json
+{
+  "usuarioId": "64f1a2b3c4d5e6f789012345",
+  "conversacionId": "64f1a2b3c4d5e6f789099999",
+  "mensaje": "Salimos desde Buenos Aires, Argentina"
+}
+```
+
+Si no se envía `conversacionId`, el servicio retoma automáticamente la última conversación en progreso de ese `usuarioId` en vez de crear una nueva.
+
+Respuesta (mientras falta información):
+
+```json
+{
+  "conversacionId": "64f1a2b3c4d5e6f789099999",
+  "estado": "incompleto",
+  "mensaje": "¿Desde qué ciudad viajarían?",
+  "viaje": { "...": "perfil de viaje acumulado hasta el momento" },
+  "camposFaltantesImportantes": ["lugarSalida.ciudad"],
+  "preguntas": [
+    {
+      "campo": "lugarSalida",
+      "pregunta": "¿Desde qué ciudad viajarían?",
+      "motivo": "El punto de salida afecta considerablemente las opciones y el costo del viaje."
+    }
+  ]
+}
+```
+
+Respuesta (cuando ya hay información suficiente):
+
+```json
+{
+  "conversacionId": "64f1a2b3c4d5e6f789099999",
+  "estado": "listoParaBuscar",
+  "mensaje": "Ya tengo la información necesaria para buscar recomendaciones de viaje.",
+  "viaje": { "...": "perfil de viaje completo" },
+  "camposFaltantesImportantes": [],
+  "preguntas": []
+}
+```
+
+Una vez que una conversación llega a `estado: "listoParaBuscar"` queda marcada como `completo` y no acepta más mensajes (devuelve 409).
+
+Obtener una conversación por id
+
+GET /api/conversaciones/64f1a2b3c4d5e6f789099999
+
+Variables de entorno necesarias: las mismas de Gemini (GEMINI_API_KEY, GEMINI_MODEL opcional).

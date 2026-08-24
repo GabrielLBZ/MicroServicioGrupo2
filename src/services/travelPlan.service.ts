@@ -34,7 +34,7 @@ export class TravelPlanService {
 
   static async generarDesdePrompt(promptUsuario: string) {
     const geminiPrompt = crearPromptTravelPlan(promptUsuario);
-    const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+    const model = process.env.GEMINI_MODEL || "gemini-3.1-flash-lite";
 
     const response = (await this.getGeminiClient().models.generateContent({
       model,
