@@ -147,10 +147,15 @@ export function crearViajeVacio(): Viaje {
 
 export type EstadoViaje = "incompleto" | "listoParaBuscar";
 
+export type TipoPregunta = "siNo" | "opciones" | "texto";
+
 export interface PreguntaViaje {
   campo: string;
   pregunta: string;
   motivo: string;
+  tipoPregunta: TipoPregunta;
+  /** Solo presente cuando tipoPregunta es "opciones": alternativas para que el usuario elija. */
+  opciones?: string[];
 }
 
 /** Respuesta que devuelve el modelo en cada turno de la conversación. */
