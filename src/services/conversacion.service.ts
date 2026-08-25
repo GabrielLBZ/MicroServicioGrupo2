@@ -4,7 +4,7 @@ import {
   PROMPT_EXTRACCION_VIAJE,
   crearEntradaExtraccionViaje,
 } from "../models/promtIA.model";
-import { crearViajeVacio, RespuestaExtraccionViaje, Viaje } from "../models/viaje.model";
+import { crearViajeVacio, fusionarViaje, RespuestaExtraccionViaje, Viaje } from "../models/viaje.model";
 import { ConversacionRepository } from "../repositorys/conversacion.repository";
 import { UsuariosRepository } from "../repositorys/user.repository";
 
@@ -137,7 +137,9 @@ export class ConversacionService {
       throw new Error("La IA devolvió una respuesta que no es JSON válido: " + texto);
     }
 
-    const viajeActualizado: Viaje = respuestaIA.viaje ?? conversacion.viaje;
+    const viajeActualizado: Viaje = respuestaIA.viaje
+      ? fusionarViaje(conversacion.viaje, respuestaIA.viaje)
+      : conversacion.viaje;
     viajeActualizado.usuario = {
       nombre: usuario.nombre,
       email: usuario.email,

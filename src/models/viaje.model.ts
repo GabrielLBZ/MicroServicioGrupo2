@@ -165,3 +165,47 @@ export interface RespuestaExtraccionViaje {
   camposFaltantesImportantes: string[];
   preguntas: PreguntaViaje[];
 }
+
+function esVacio(valor: unknown): boolean {
+  if (valor === null || valor === undefined) return true;
+  if (Array.isArray(valor)) return valor.length === 0;
+  return false;
+}
+
+function esObjetoPlano(valor: unknown): valor is Record<string, unknown> {
+  return typeof valor === "object" && valor !== null && !Array.isArray(valor);
+}
+
+function fusionarValor(anterior: unknown, nuevo: unknown): unknown {
+  if (nuevo === undefined) return anterior;
+  if (esVacio(nuevo) && !esVacio(anterior)) return anterior;
+  if (esObjetoPlano(anterior) && esObjetoPlano(nuevo)) {
+    return fusionarObjeto(anterior, nuevo);
+  }
+  return nuevo;
+}
+
+function fusionarObjeto(
+  anterior: Record<string, unknown>,
+  nuevo: Record<string, unknown>
+): Record<string, unknown> {
+  const resultado: Record<string, unknown> = { ...anterior };
+  for (const key of Object.keys(nuevo)) {
+    resultado[key] = fusionarValor(anterior[key], nuevo[key]);
+  }
+  return resultado;
+}
+
+/**
+ * Combina el `viaje` que devuelve la IA en un turno con el que ya se venía
+ * acumulando, conservando cualquier dato previamente completado que la IA
+ * haya devuelto en `null`/vacío por error en ese turno (el prompt le pide
+ * que nunca "olvide" info ya obtenida, pero esto lo garantiza del lado del
+ * código en vez de confiar 100% en que el modelo lo respete siempre).
+ */
+export function fusionarViaje(anterior: Viaje, nuevo: Viaje): Viaje {
+  return fusionarObjeto(
+    anterior as unknown as Record<string, unknown>,
+    nuevo as unknown as Record<string, unknown>
+  ) as unknown as Viaje;
+}

@@ -190,7 +190,7 @@ Body (mensajes siguientes, ya con conversacionId devuelto por el primer mensaje)
 
 Si no se envía `conversacionId`, el servicio retoma automáticamente la última conversación en progreso de ese `usuarioId` en vez de crear una nueva.
 
-Respuesta (mientras falta información):
+La IA hace **una sola pregunta por turno** (como un chat), priorizando la que más reduzca la incertidumbre — el array `preguntas` tiene como máximo 1 elemento. Ejemplos de respuesta según `tipoPregunta` (mientras falta información):
 
 ```json
 {
@@ -205,18 +205,32 @@ Respuesta (mientras falta información):
       "pregunta": "¿Desde qué ciudad viajarían?",
       "motivo": "El punto de salida afecta considerablemente las opciones y el costo del viaje.",
       "tipoPregunta": "texto"
-    },
+    }
+  ]
+}
+```
+
+```json
+{
+  "preguntas": [
     {
       "campo": "preferencias.ritmoViaje",
       "pregunta": "¿Qué ritmo de viaje prefieren?",
       "motivo": "Afecta cuántas actividades por día conviene recomendar.",
       "tipoPregunta": "opciones",
       "opciones": ["Tranquilo", "Equilibrado", "Intenso"]
-    },
+    }
+  ]
+}
+```
+
+```json
+{
+  "preguntas": [
     {
-      "campo": "presupuesto.incluyeTransporte",
-      "pregunta": "¿Ese presupuesto incluye los pasajes?",
-      "motivo": "Necesito saber si el monto es solo para estadía o también para el transporte.",
+      "campo": "viajeros.cantidadTotal",
+      "pregunta": "¿Viajás acompañado?",
+      "motivo": "Determina si hace falta preguntar la cantidad exacta de viajeros en el próximo turno.",
       "tipoPregunta": "siNo"
     }
   ]
@@ -228,6 +242,8 @@ Respuesta (mientras falta información):
 - `texto`: mostrar un campo de texto libre para que el usuario escriba.
 - `siNo`: mostrar botones/opciones de Sí / No.
 - `opciones`: mostrar una encuesta de opción múltiple con las alternativas del array `opciones` (2 a 5 strings).
+
+La IA prefiere `siNo`/`opciones` por sobre `texto` libre cuando el dato lo permite (ver `promtIA.model.ts`, sección "Preferí preguntas cerradas").
 
 Respuesta (cuando ya hay información suficiente):
 
