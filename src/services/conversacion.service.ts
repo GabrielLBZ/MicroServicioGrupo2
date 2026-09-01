@@ -172,6 +172,28 @@ export class ConversacionService {
       }
     );
 
+  if (estadoIA === "listoParaBuscar") {
+    const response = await fetch("http://192.168.88.175:3000/api/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        usuarioId,
+        //conversacionId: conversacionActualizada!._id!.toString(),
+        viaje: viajeActualizado,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    console.log(data);
+  }
+
     return {
       conversacionId: conversacionActualizada!._id!.toString(),
       estado: estadoIA,
