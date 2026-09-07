@@ -1,4 +1,5 @@
 import { setServers } from "node:dns";
+import { requireInternalKey } from "./middlewares/internalKey.middleware";
 
 import express from "express";
 import "dotenv/config";
@@ -15,9 +16,9 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.use("/api/users", userRoutes);
-app.use("/api/ia", geminiRoutes);
-app.use("/api/travel-plans", travelPlanRoutes);
+app.use("/api/users", requireInternalKey, userRoutes);
+app.use("/api/ia", requireInternalKey, geminiRoutes);
+app.use("/api/travel-plans",requireInternalKey, travelPlanRoutes);
 app.use("/api/conversaciones", conversacionRoutes);
 
 app.get("/", async (req, res) => {

@@ -7,6 +7,7 @@ import {
 import { crearViajeVacio, fusionarViaje, RespuestaExtraccionViaje, Viaje } from "../models/viaje.model";
 import { ConversacionRepository } from "../repositorys/conversacion.repository";
 import { UsuariosRepository } from "../repositorys/user.repository";
+import { ViajeSurveyRepository } from "../repositorys/viajeSurvey.repository";
 
 export class ConversacionError extends Error {
   constructor(message: string, public statusCode: number) {
@@ -66,6 +67,14 @@ export class ConversacionService {
     conversacionId?: string,
     nuevaConversacion?: boolean
   ) {
+    console.log("[ConversacionService] Petición recibida desde el front", {
+      fecha: new Date().toISOString(),
+      usuarioId,
+      conversacionId: conversacionId ?? null,
+      nuevaConversacion: nuevaConversacion ?? false,
+      mensajeLength: mensajeUsuario.length,
+    });
+
     if (!ObjectId.isValid(usuarioId)) {
       throw new ConversacionError("usuarioId inválido", 400);
     }
@@ -162,6 +171,7 @@ export class ConversacionService {
     ];
 
     const estadoConversacion = estadoIA === "listoParaBuscar" ? "completo" : "en_progreso";
+    let viajeId: string | null = null;
 
     const conversacionActualizada = await ConversacionRepository.actualizar(
       conversacion._id!.toString(),
@@ -173,15 +183,20 @@ export class ConversacionService {
     );
 
     if (estadoIA === "listoParaBuscar") {
+      const viajeSurvey = await ViajeSurveyRepository.crear({
+        usuarioId: new ObjectId(usuarioId),
+        conversacionId: conversacionActualizada!._id!,
+        viaje: viajeActualizado,
+      });
+      viajeId = viajeSurvey._id!.toString();
+
       const response = await fetch("http://192.168.45.10:3000/api/survey", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          usuarioId,
-          //conversacionId: conversacionActualizada!._id!.toString(),
-          viaje: viajeActualizado,
+          id: conversacionActualizada!._id!.toString(),
         }),
       });
 
@@ -198,6 +213,7 @@ export class ConversacionService {
       conversacionId: conversacionActualizada!._id!.toString(),
       estado: estadoIA,
       mensaje: mensajeAsistente,
+      viajeId,
       viaje: viajeActualizado,
       camposFaltantesImportantes,
       preguntas,
