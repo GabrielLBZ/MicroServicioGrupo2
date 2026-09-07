@@ -172,27 +172,27 @@ export class ConversacionService {
       }
     );
 
-  if (estadoIA === "listoParaBuscar") {
-    const response = await fetch("http://192.168.88.175:3000/api/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        usuarioId,
-        //conversacionId: conversacionActualizada!._id!.toString(),
-        viaje: viajeActualizado,
-      }),
-    });
+    if (estadoIA === "listoParaBuscar") {
+      const response = await fetch("http://192.168.45.10:3000/api/survey", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          usuarioId,
+          //conversacionId: conversacionActualizada!._id!.toString(),
+          viaje: viajeActualizado,
+        }),
+      });
 
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      console.log(data);
     }
-
-    const data = await response.json();
-
-    console.log(data);
-  }
 
     return {
       conversacionId: conversacionActualizada!._id!.toString(),
